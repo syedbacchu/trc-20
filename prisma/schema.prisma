@@ -1,0 +1,300 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model activity_logs {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id    BigInt    @db.UnsignedBigInt
+  action     String
+  source     String
+  ip_address String
+  location   String
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "activity_logs_user_id_foreign")
+
+  @@index([user_id], map: "activity_logs_user_id_foreign")
+}
+
+
+model admin_settings {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  slug       String    @unique(map: "admin_settings_slug_unique") @db.VarChar(180)
+  value      String?   @db.LongText
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+
+model affiliation_codes {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id    BigInt    @db.UnsignedBigInt
+  code       String    @unique(map: "affiliation_codes_code_unique") @db.VarChar(180)
+  status     Int       @default(1)
+  deleted_at DateTime? @db.Timestamp(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "affiliation_codes_user_id_foreign")
+
+  @@index([user_id], map: "affiliation_codes_user_id_foreign")
+}
+
+
+
+
+
+
+model contact_us {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String
+  email       String
+  phone       String?
+  address     String?
+  description String
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model country_lists {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  key        String
+  value      String
+  status     Int       @default(1) @db.TinyInt
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model currency_lists {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String
+  code       String    @unique(map: "currency_lists_code_unique") @db.VarChar(180)
+  symbol     String    @db.VarChar(50)
+  rate       Decimal   @default(1.00) @db.Decimal(19, 2)
+  status     Int       @default(1) @db.TinyInt
+  is_primary Int       @default(0) @db.TinyInt
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model custom_pages {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title       String    @db.VarChar(256)
+  key         String    @db.VarChar(256)
+  type        Int       @default(1) @db.TinyInt
+  data_order  Int       @default(0)
+  description String?   @db.LongText
+  status      Int       @default(1) @db.TinyInt
+  page_link   String?   @db.Text
+  page_type   Int       @default(1) @db.TinyInt
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model faqs {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  question    String    @db.Text
+  answer      String    @db.LongText
+  status      Int       @default(1) @db.TinyInt
+  author      BigInt?
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  faq_type_id BigInt?
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String
+  batch     Int
+}
+
+model notifications {
+  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id           BigInt
+  title             String
+  notification_body String?   @db.LongText
+  type              Int       @default(1) @db.TinyInt
+  status            Int       @default(0) @db.TinyInt
+  created_at        DateTime? @db.Timestamp(0)
+  updated_at        DateTime? @db.Timestamp(0)
+}
+
+model oauth_access_tokens {
+  id         String    @id @db.VarChar(100)
+  user_id    BigInt?   @db.UnsignedBigInt
+  client_id  BigInt    @db.UnsignedBigInt
+  name       String?
+  scopes     String?   @db.Text
+  revoked    Boolean
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  expires_at DateTime? @db.DateTime(0)
+
+  @@index([user_id], map: "oauth_access_tokens_user_id_index")
+}
+
+model oauth_auth_codes {
+  id         String    @id @db.VarChar(100)
+  user_id    BigInt    @db.UnsignedBigInt
+  client_id  BigInt    @db.UnsignedBigInt
+  scopes     String?   @db.Text
+  revoked    Boolean
+  expires_at DateTime? @db.DateTime(0)
+
+  @@index([user_id], map: "oauth_auth_codes_user_id_index")
+}
+
+model oauth_clients {
+  id                     BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id                BigInt?   @db.UnsignedBigInt
+  name                   String
+  secret                 String?   @db.VarChar(100)
+  provider               String?
+  redirect               String    @db.Text
+  personal_access_client Boolean
+  password_client        Boolean
+  revoked                Boolean
+  created_at             DateTime? @db.Timestamp(0)
+  updated_at             DateTime? @db.Timestamp(0)
+
+  @@index([user_id], map: "oauth_clients_user_id_index")
+}
+
+model oauth_personal_access_clients {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  client_id  BigInt    @db.UnsignedBigInt
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model oauth_refresh_tokens {
+  id              String    @id @db.VarChar(100)
+  access_token_id String    @db.VarChar(100)
+  revoked         Boolean
+  expires_at      DateTime? @db.DateTime(0)
+
+  @@index([access_token_id], map: "oauth_refresh_tokens_access_token_id_index")
+}
+
+
+model personal_access_tokens {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenable_type String
+  tokenable_id   BigInt    @db.UnsignedBigInt
+  name           String
+  token          String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
+  abilities      String?   @db.Text
+  last_used_at   DateTime? @db.Timestamp(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+
+  @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
+}
+
+model referral_users {
+  id                                    BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id                               BigInt    @unique(map: "referral_users_user_id_unique") @db.UnsignedBigInt
+  parent_id                             BigInt    @db.UnsignedBigInt
+  deleted_at                            DateTime? @db.Timestamp(0)
+  created_at                            DateTime? @db.Timestamp(0)
+  updated_at                            DateTime? @db.Timestamp(0)
+  users_referral_users_parent_idTousers users     @relation("referral_users_parent_idTousers", fields: [parent_id], references: [id], onDelete: Cascade, map: "referral_users_parent_id_foreign")
+  users_referral_users_user_idTousers   users     @relation("referral_users_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade, map: "referral_users_user_id_foreign")
+
+  @@index([parent_id], map: "referral_users_parent_id_foreign")
+}
+
+model roles {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title      String    @db.VarChar(80)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+
+
+model user_settings {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id    BigInt    @db.UnsignedBigInt
+  slug       String
+  value      String
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_settings_user_id_foreign")
+
+  @@index([user_id], map: "user_settings_user_id_foreign")
+}
+
+model user_verification_codes {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id    BigInt    @db.UnsignedBigInt
+  code       String
+  status     Int       @default(0) @db.TinyInt
+  type       Int       @default(1) @db.TinyInt
+  expired_at DateTime  @db.DateTime(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model users {
+  id                                                          BigInt                  @id @default(autoincrement()) @db.UnsignedBigInt
+  first_name                                                  String
+  last_name                                                   String
+  nickname                                                    String?
+  email                                                       String                  @unique(map: "users_email_unique") @db.VarChar(180)
+  reset_code                                                  String?                 @unique(map: "users_reset_code_unique") @db.VarChar(180)
+  role                                                        Int                     @default(2)
+  role_id                                                     Int                     @db.UnsignedInt
+  super_admin                                                 Boolean                 @default(false)
+  status                                                      Int                     @default(1)
+  is_default                                                  Int                     @default(0) @db.TinyInt
+  delete_request                                              Int                     @default(0) @db.TinyInt
+  last_seen                                                   DateTime?               @db.Timestamp(0)
+  phone                                                       String?
+  phone_verified                                              Int                     @default(0) @db.TinyInt
+  country                                                     String?
+  gender                                                      Int                     @default(1) @db.TinyInt
+  birth_date                                                  String?
+  photo                                                       String?
+  g2f_enabled                                                 String?
+  google2fa_secret                                            String?
+  phone_enabled                                               String?
+  otp_code                                                    String?                 @db.VarChar(10)
+  email_enabled                                               String?
+  is_verified                                                 Int                     @default(0) @db.TinyInt
+  password                                                    String
+  language                                                    String                  @default("en")
+  currency                                                    String                  @default("USD")
+  device_id                                                   String?
+  device_type                                                 Int                     @default(1) @db.TinyInt
+  push_notification_status                                    Int                     @default(1) @db.TinyInt
+  email_notification_status                                   Int                     @default(1) @db.TinyInt
+  remember_token                                              String?                 @db.VarChar(100)
+  created_at                                                  DateTime?               @db.Timestamp(0)
+  updated_at                                                  DateTime?               @db.Timestamp(0)
+  delete_request_reason                                       String?                 @db.Text
+  activity_logs                                               activity_logs[]
+  affiliation_codes                                           affiliation_codes[]
+  referral_users_referral_users_parent_idTousers              referral_users[]        @relation("referral_users_parent_idTousers")
+  referral_users_referral_users_user_idTousers                referral_users?         @relation("referral_users_user_idTousers")
+  user_settings                                               user_settings[]
+  verification_details                                        verification_details[]
+}
+
+model verification_details {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id    BigInt    @db.UnsignedBigInt
+  field_name String
+  status     Int       @default(0) @db.TinyInt
+  photo      String?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "verification_details_user_id_foreign")
+
+  @@index([user_id], map: "verification_details_user_id_foreign")
+}
+
