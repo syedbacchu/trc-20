@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { generateErrorResponse, generateSuccessResponse } from "../utils/commonObject";
-import { checkTrxAddress, checkTrxDepositByBlockNumber, createTrxAddress, getTrcLatestBlockNumber, getTrxAccount, getTrxAddressByPk, getTrxBalance, getTrxTransactionBlock, sendTrxCoin } from "./evm/trx.tron-web.service";
+import { checkTrxAddress, checkTrxDepositByBlockNumber, createTrxAddress, getTrxAccount, getTrxAddressByPk, getTrxBalance, getTrxCurrentBlockNumberByRpcUrl, getTrxTransactionBlock, getTrxTransactionBlockRange, sendTrxCoin } from "./evm/trx.tron-web.service";
 
 const prisma = new PrismaClient();
 
@@ -63,7 +63,15 @@ const getSingleBlockTransactionData = async (request:any) => {
 
 const getTrxLatestBlockNumber = async (request:any) => {
   const rpcUrl = request.rpc_url ? request.rpc_url : 'https://api.trongrid.io/'
-  const response = await getTrcLatestBlockNumber(rpcUrl); 
+  const response = await getTrxCurrentBlockNumberByRpcUrl(rpcUrl); 
+  return response;
+};
+
+const getManyBlockTransactionData = async (request:any) => {
+  const rpcUrl = request.rpc_url ? request.rpc_url : 'https://api.trongrid.io/'
+  const fromBlockNumber = request.from_block_number ? request.from_block_number : 23985263
+  const toBlockNumber = request.to_block_number ? request.to_block_number : 23985293
+  const response = await getTrxTransactionBlockRange(rpcUrl,fromBlockNumber,toBlockNumber); 
   return response;
 };
 
@@ -76,5 +84,6 @@ export {
     checkTrxAddressValidOrNot,
     checkTrxTransactionByTxHash,
     getSingleBlockTransactionData,
-    getTrxLatestBlockNumber
+    getTrxLatestBlockNumber,
+    getManyBlockTransactionData
 }

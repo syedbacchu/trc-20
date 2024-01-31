@@ -227,8 +227,12 @@ const getTrxCurrentBlockNumberByRpcUrl = async(rpcUrl:any) => {
     
   } catch(err:any) {
     console.log('getTrxCurrentBlockNumberByRpcUrl err', err.stack);
+    return generateErrorResponse(err.stack ?? "Something went wrong");
   }
-  return latestBlockNumber;
+  if (latestBlockNumber > 0) {
+    return generateSuccessResponse("Block get successfully", latestBlockNumber);
+  }
+  return generateErrorResponse("Something went wrong");
 }
 
 

@@ -16,7 +16,7 @@ export const successResponse = (
   res.json({
     success: true,
     message: message ? message : "Response successful",
-    data,
+    data:data ? data : {},
   });
 };
 
@@ -24,7 +24,7 @@ export const errorResponse = (res: Response, message: string, data?: any) => {
   res.json({
     success: false,
     message: message ? message : "Something went wrong",
-    data,
+    data:data ? data : {},
   });
 };
 export function processException(res: Response, error: any) {
